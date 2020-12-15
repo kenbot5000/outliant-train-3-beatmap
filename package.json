@@ -6,20 +6,27 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
-    "create-db": "cd models && node osuCreateTable.js && cd ..",
-    "load-db": "cd models && node osuLoadTable.js && cd ..",
-    "test-read-db": "cd models && node osuReadDataTest.js && cd .."
+    "create-maps": "cd models && node osuCreateTable.js && cd ..",
+    "populate-maps": "cd models && node osuLoadTable.js && cd ..",
+    "test-read-maps": "cd models && node osuReadDataTest.js && cd ..",
+    "create-users": "cd models && node userCreateTable.js && cd .."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.809.0",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "consola": "^2.15.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.3",
     "nodemon": "^2.0.6"
+  },
+  "devDependencies": {
+    "eslint": "^7.15.0",
+    "eslint-config-google": "^0.14.0"
   }
 }
