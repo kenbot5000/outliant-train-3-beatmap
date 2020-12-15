@@ -16,6 +16,9 @@ app.use('/users', userRoute);
 const osuRoute = require('./routes/osuRoute');
 app.use('/maps', osuRoute);
 
+const authRoute = require('./routes/authRoute');
+app.use('/auth', authRoute);
+
 app.listen(port, () => {
   consola.ready({
     message: `Server listening on http://${host}:${port}`,
