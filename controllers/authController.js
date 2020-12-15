@@ -12,6 +12,23 @@ const resetClient = (req, res, next) => {
   next();
 };
 
+function generateToken(username, access=true) {
+  let time;
+  let secret;
+  if (access) {
+    time = (20 * 60);
+    secret = process.env.ACCESS_TOKEN_SECRET;
+  } else {
+    time = (12 * 60 * 60);
+    secret = process.env.REFRESH_TOKEN_SECRET;
+  }
+  const token = jwt.sign({
+    exp: (Date.now()/1000) + time,
+    data: username
+  }, secret);
+  return token;
+}
+
 const login = async (req, res) => {
   // Gets user
   db.params.KeyConditionExpression = 'username = :u';
@@ -22,7 +39,7 @@ const login = async (req, res) => {
   let user = await db.docClient.query(db.params).promise();
   let userExists = (user.Items.length > 0);
 
-  resetClient();
+  db.resetClient();
 
   if(!userExists) {
     res.status(400).json({res: 'User does not exist.'});
@@ -32,8 +49,10 @@ const login = async (req, res) => {
         res.json({res: 'Password is incorrect!'});
       } else {
         // Generate access token
-        const token = jwt.sign(req.body.username, process.env.ACCESS_TOKEN_SECRET);
-        res.json({token});
+        const accessToken = generateToken(req.body.username);
+        // Generate refresh token
+        const refreshToken = generateToken(req.body.username, false);
+        res.json({accessToken: accessToken, refreshToken: refreshToken});
       }
     });
   }
@@ -69,9 +88,26 @@ const register = async (req, res) => {
   }
 };
 
+const refreshAccess = (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const refreshToken = authHeader && authHeader.split(' ')[1];
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
+    if (err) {
+      console.log(err);
+      if(err.name === 'TokenExpiredError') {
+        return res.status(403).json({res: 'Refresh token expired. Please login again.'});
+      }
+    }
+    const newAccessToken = generateToken(data.data);
+    const newRefreshToken = generateToken(data.data, false);
+    res.json({accessToken: newAccessToken, refreshToken: newRefreshToken});
+  });
+};
+
 
 module.exports = {
   resetClient,
   login,
-  register
+  register,
+  refreshAccess
 };

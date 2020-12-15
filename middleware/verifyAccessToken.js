@@ -6,7 +6,15 @@ let verifyToken = function (req, res, next) {
   if(token === null) return res.status(401).json({res: 'You are not authenticated'});
   
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if(err) return res.sendStatus(403);
+    if (err) {
+      console.log(err);
+      if(err.name === 'TokenExpiredError') {
+        return res.status(403).json({res: 'Token expired.'});
+      } else {
+        console.log(err);
+        res.sendStatus(403);
+      }
+    }
     req.user = user;
     next();
   });
