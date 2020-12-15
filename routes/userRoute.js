@@ -5,7 +5,7 @@ const userController = require('../controllers/userController');
 
 router.get('/all', userController.getAllUsers);
 router.get('/', userController.getUser);
-// Add PATCH endpoint
+router.patch('/', userController.updateUser);
 router.delete('/', userController.deleteUser);
 router.delete('/clear', userController.deleteAllUsers);
 

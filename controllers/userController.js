@@ -1,9 +1,28 @@
+require('dotenv').config();
+
 const AWSConfig = require('./AWSConfig');
 let db = new AWSConfig('Users');
+
+const bcrypt = require('bcrypt');
+const saltRounds = parseInt(process.env.SALT_ROUNDS);
 
 const resetClient = (req, res, next) => {
   db.resetClient();
   next();
+};
+const createUser = async (req, res) => {
+  const hash = await bcrypt.hash(req.body.password, saltRounds);
+  db.params.Item = {
+    'username': req.body.username,
+    'password': hash
+  };
+  db.docClient.put(db.params, (err) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.sendStatus(201);
+    }
+  });
 };
 const getAllUsers = async (req, res) => {
   const items = await db.docClient.scan(db.params).promise();
@@ -23,6 +42,32 @@ const getUser = async (req, res) => {
   // Get all users
   } else {
     res.status(400).json({res: 'User does not exist.'});
+  }
+};
+const updateUser = async (req, res) => {
+  if(!req.body.username) {
+    res.status(400).json({res: 'Username must be supplied.'});
+  } else {
+    db.params.Key = {
+      'username': req.body.username
+    };
+    db.params.ConditionExpression = 'username = :u';
+    db.params.UpdateExpression = 'set password = :p',
+    db.params.ExpressionAttributeValues = {
+      ':u': req.body.username,
+      ':p': req.body.password
+    },
+    db.params.ReturnValues = 'UPDATED_NEW';
+    db.docClient.update(db.params, (err, data) => {
+      if (err) {
+        if (err.code === 'ConditionalCheckFailedException') res.status(400).json({res: 'The requested resource does not exist!'});
+        else {
+          console.error(err);
+        }
+      } else {
+        res.json({res: data.Attributes});
+      }
+    });
   }
 };
 const deleteUser = async (req, res) => {
@@ -63,9 +108,11 @@ const deleteAllUsers = async (req, res) => {
 };
 
 module.exports = {
+  createUser,
   resetClient,
   getAllUsers,
   getUser,
+  updateUser,
   deleteUser,
   deleteAllUsers
 };
