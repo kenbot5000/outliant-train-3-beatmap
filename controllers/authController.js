@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const AWSConfig = require('./AWSConfig');
+const AWSConfig = require('../config/AWSConfig');
 let db = new AWSConfig('Users');
 
 const jwt = require('jsonwebtoken');
@@ -69,7 +69,7 @@ const register = async (req, res) => {
 
   // Hash password
   if(!userExists) {
-    resetClient();
+    db.resetClient();
     const hash = await bcrypt.hash(req.body.password, saltRounds);
     db.params.Item = {
       'username': req.body.username,

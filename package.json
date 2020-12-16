@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
+    "start": "node app.js",
+    "start_dev": "nodemon app.js",
     "create-maps": "cd models && node osuCreateTable.js && cd ..",
     "populate-maps": "cd models && node osuLoadTable.js && cd ..",
     "test-read-maps": "cd models && node osuReadDataTest.js && cd ..",

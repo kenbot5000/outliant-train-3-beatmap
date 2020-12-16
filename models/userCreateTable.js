@@ -1,16 +1,9 @@
 require('dotenv').config({path: __dirname+'/./../.env'});
 
-let AWS = require('aws-sdk');
+const AWSConfig = require('../config/AWSConfig')
+const AWS = new AWSConfig();
 
-const region = process.env.AWS_REGION;
-const endpoint = process.env.DBLOC;
-
-AWS.config.update({
-  region: region,
-  endpoint: endpoint
-});
-
-let dynamodb = new AWS.DynamoDB();
+let dynamodb = AWS.generateDynamoDBInstance();
 
 let params = {
   TableName: 'Users',

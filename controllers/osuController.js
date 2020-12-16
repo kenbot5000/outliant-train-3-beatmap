@@ -1,4 +1,4 @@
-const AWSConfig = require('./AWSConfig');
+const AWSConfig = require('../config/AWSConfig');
 let db = new AWSConfig('OsuBeatmaps');
 
 const resetClient = (req, res, next) => {

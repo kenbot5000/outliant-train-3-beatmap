@@ -1,3 +1,4 @@
+require('dotenv').config()
 // AWS Setup
 const AWS = require('aws-sdk');
 
@@ -5,7 +6,8 @@ class AWSConfig {
   constructor(tableName) {
     AWS.config.update({
       region: 'us-west-2',
-      endpoint: process.env.DBLOC,
+      accessKeyId: process.env.ACCESS_ID,
+      secretAccessKey: process.env.SECRET_ACCESS_KEY
     });
     this.docClient = new AWS.DynamoDB.DocumentClient();
     this.tableName = tableName;
@@ -16,6 +18,9 @@ class AWSConfig {
   }
   setTableName(tableName) {
     this.params.TableName = tableName;
+  }
+  generateDynamoDBInstance() {
+    return new AWS.DynamoDB();
   }
 }
 

@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const AWSConfig = require('./AWSConfig');
+const AWSConfig = require('../config/AWSConfig');
 let db = new AWSConfig('Users');
 
 const bcrypt = require('bcrypt');
