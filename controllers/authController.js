@@ -4,7 +4,7 @@ const AWSConfig = require('../config/AWSConfig');
 let db = new AWSConfig('Users');
 
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 let saltRounds = parseInt(process.env.SALT_ROUNDS);
 
 const resetClient = (req, res, next) => {

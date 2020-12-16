@@ -3,7 +3,7 @@ require('dotenv').config();
 const AWSConfig = require('../config/AWSConfig');
 let db = new AWSConfig('Users');
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
 
 const resetClient = (req, res, next) => {
