@@ -23,7 +23,7 @@ const getMap = (req, res) => {
       res.json({res: data.Items});
     });
   } else {
-    res.json({res: 'Title and Mapper must be supplied.'}); 
+    res.status(404).json({res: 'Title and Mapper must be supplied.'}); 
   }
 };
 const createMap = async (req, res) => {
@@ -62,7 +62,7 @@ const updateMap = (req, res) => {
 
     db.docClient.update(db.params, (err, data) => {
       if (err) {
-        if (err.code === 'ConditionalCheckFailedException') res.status(400).json({res: 'The requested resource does not exist!'});
+        if (err.code === 'ConditionalCheckFailedException') res.status(404).json({res: 'The requested resource does not exist!'});
         else {
           console.error(err);
         }
@@ -73,12 +73,12 @@ const updateMap = (req, res) => {
   }
 };
 const deleteMap = (req, res) => {
-  if (!req.body.title || !req.body.mapper) {
+  if (!req.query.title || !req.query.mapper) {
     res.status(400).json({res: 'Title and Mapper must be given!'});
   } else {
     db.params.Key = {
-      'title': req.body.title,
-      'mapper': req.body.mapper,
+      'title': req.query.title,
+      'mapper': req.query.mapper,
     };
     db.params.ConditionExpression = 'title = :t AND mapper = :m';
     db.params.ExpressionAttributeValues = {
@@ -88,7 +88,7 @@ const deleteMap = (req, res) => {
 
     db.docClient.delete(db.params, (err, data) => {
       if (err) {
-        if (err.code === 'ConditionalCheckFailedException') res.status(400).json({res: 'The requested resource does not exist!'});
+        if (err.code === 'ConditionalCheckFailedException') res.status(404).json({res: 'The requested resource does not exist!'});
         else {
           console.error(err);
         }

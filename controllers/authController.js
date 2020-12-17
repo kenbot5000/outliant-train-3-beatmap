@@ -42,7 +42,7 @@ const login = async (req, res) => {
   db.resetClient();
 
   if(!userExists) {
-    res.status(400).json({res: 'User does not exist.'});
+    res.status(404).json({res: 'User does not exist.'});
   } else {
     bcrypt.compare(req.body.password, user.Items[0].password, function(err, result) {
       if(!result) {
@@ -84,7 +84,7 @@ const register = async (req, res) => {
     });
 
   } else {
-    res.status(400).json({res: 'User already exists!'});
+    res.status(403).json({res: 'User already exists!'});
   }
 };
 
@@ -95,7 +95,7 @@ const refreshAccess = (req, res) => {
     if (err) {
       console.log(err);
       if(err.name === 'TokenExpiredError') {
-        return res.status(403).json({res: 'Refresh token expired. Please login again.'});
+        return res.status(401).json({res: 'Refresh token expired. Please login again.'});
       }
     }
     const newAccessToken = generateToken(data.data);

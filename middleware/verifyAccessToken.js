@@ -9,10 +9,10 @@ let verifyToken = function (req, res, next) {
     if (err) {
       console.log(err);
       if(err.name === 'TokenExpiredError') {
-        return res.status(403).json({res: 'Token expired.'});
+        return res.status(401).json({res: 'Token expired.'});
       } else {
         console.log(err);
-        res.sendStatus(403);
+        res.sendStatus(401);
       }
     }
     req.user = user;

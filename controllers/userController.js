@@ -38,10 +38,9 @@ const getUser = async (req, res) => {
       if (err) console.log(err);
       res.json({res: data.Items});
     });
-    resetClient();
-  // Get all users
+    db.resetClient();
   } else {
-    res.status(400).json({res: 'User does not exist.'});
+    res.status(404).json({res: 'User does not exist.'});
   }
 };
 const updateUser = async (req, res) => {
@@ -60,7 +59,7 @@ const updateUser = async (req, res) => {
     db.params.ReturnValues = 'UPDATED_NEW';
     db.docClient.update(db.params, (err, data) => {
       if (err) {
-        if (err.code === 'ConditionalCheckFailedException') res.status(400).json({res: 'The requested resource does not exist!'});
+        if (err.code === 'ConditionalCheckFailedException') res.status(404).json({res: 'The requested resource does not exist!'});
         else {
           console.error(err);
         }
@@ -88,7 +87,7 @@ const deleteUser = async (req, res) => {
       resetClient();
     }
   } else {
-    res.status(400).json({res: 'User does not exist.'});
+    res.status(404).json({res: 'User does not exist.'});
   }
 };
 const deleteAllUsers = async (req, res) => {
