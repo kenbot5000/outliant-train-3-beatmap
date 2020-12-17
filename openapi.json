@@ -1,0 +1,547 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Simple osu! Beatmap API",
+    "description": "A simple beatmap API for a training task.",
+    "contact": {
+      "email": "kenshin@outliant.com"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "GitHub",
+    "url": "https://github.com/kenbot5000/outliant-train-3-beatmap-api"
+  },
+  "servers": [
+    {
+      "url": "http://fullstacktraining-env.eba-u7k4th58.us-west-2.elasticbeanstalk.com/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "User authentication and tokens"
+    },
+    {
+      "name": "Maps",
+      "description": "Access to beatmap info"
+    },
+    {
+      "name": "User",
+      "description": "Operations about the user object."
+    }
+  ],
+  "paths": {
+    "/maps": {
+      "post": {
+        "tags": [
+          "Maps"
+        ],
+        "summary": "Add a new map",
+        "operationId": "createMap",
+        "requestBody": {
+          "description": "The new beatmap to be added.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Map"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Map"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Maps"
+        ],
+        "summary": "Updates a map",
+        "operationId": "updateMap",
+        "requestBody": {
+          "description": "Updates the map found at the specified keys.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Map"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Properties: title, mapper must be supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Requested resource cannot be found",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Maps"
+        ],
+        "summary": "Deletes a map at the specified keys combination.",
+        "description": "Supply title and mapper to delete beatmap record.",
+        "operationId": "deleteMap",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the song",
+            "required": true
+          },
+          {
+            "name": "mapper",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the song mapper",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion",
+            "content": {}
+          },
+          "400": {
+            "description": "Properties: title, mapper must be supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Requested resource cannot be found",
+            "content": {}
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Maps"
+        ],
+        "summary": "Finds map via title and mapper",
+        "description": "Supply title and mapper to query for map",
+        "operationId": "getMap",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the song",
+            "required": true
+          },
+          {
+            "name": "mapper",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the song mapper",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Map"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/maps/all": {
+      "get": {
+        "tags": [
+          "Maps"
+        ],
+        "summary": "Returns all beatmaps",
+        "description": "Returns all beatmaps.",
+        "operationId": "getAllMaps",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Map"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "login",
+        "description": "Send plaintext user creds, receive access and refresh tokens",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPlain"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User does not exist.",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPlain"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "description": "User already exists."
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "refreshAccess",
+        "summary": "Refreshes your tokens",
+        "description": "This route does not need any request parameters except for the bearer authentication with your access token. This allows to refresh both access and refresh tokens.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New refresh and access tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token is already expired. Login again."
+          }
+        }
+      }
+    },
+    "/users/all": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "getAllUsers",
+        "summary": "Returns all users",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Gets user by username",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The requested resource does not exist."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "createUser",
+        "summary": "Creates a new user.",
+        "description": "Creates a new user from the parameters supplied. Note that you need to be authenticated to use this route, and that you need to hash the password with bcrypt for logins to work. Use /auth/register to create a new user account instead.",
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "updateUser",
+        "summary": "Updates the user object",
+        "description": "Updates the user object. Good for updating your password.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "password": {
+                      "type": "string",
+                      "example": "$2y$12$S4tcIRjOZmKqVhIw2C9Nguc1FjiHLbO4eDZlgldJSYYbnpoPa0N/y"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Username must be supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "User not found",
+            "content": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "deleteUser",
+        "summary": "Deletes a user",
+        "description": "Deletes the user at the specified username.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion",
+            "content": {}
+          },
+          "404": {
+            "description": "Requested resource cannot be found",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/clear": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "deleteAllUsers",
+        "description": "Deletes all users",
+        "responses": {
+          "200": {
+            "description": "Database cleared successfully",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Map": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "mapper": {
+            "type": "string"
+          },
+          "artist": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "integer"
+          },
+          "plays": {
+            "type": "integer"
+          }
+        },
+        "xml": {
+          "name": "Map"
+        }
+      },
+      "UserPlain": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "example": "$2y$12$S4tcIRjOZmKqVhIw2C9Nguc1FjiHLbO4eDZlgldJSYYbnpoPa0N/y"
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.Xs1l2H7ui_yqE-GlQ2GARQ5ZpjuS8B8xQaooy89Q8y8"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.GHx0JXPXlpfWPmqHdhwY_qasX_Rb4yVEOjxHGK5Jyeg"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
